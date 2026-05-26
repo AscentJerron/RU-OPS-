@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robinson Unmanned OPS</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#0d1117;--bg1:#161b22;--bg2:#1c2230;--bg3:#21293a;
+  --border:#2a3548;--border2:#334060;
+  --txt:#e6edf3;--txt2:#8b949e;--txt3:#586374;
+  --green-bg:#122820;--green-txt:#3fb950;
+  --amber-bg:#2d2208;--amber-txt:#e3b341;
+  --red-bg:#2d1117;--red-txt:#f85149;
+  --blue-bg:#0d2340;--blue-txt:#58a6ff;
+  --purple-bg:#1e1240;--purple-txt:#bc8cff;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --font-mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+}
+body{background:var(--bg0);font-family:var(--font-sans);color:var(--txt);min-height:100vh;padding:1.25rem 1.5rem}
+.ap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;padding-bottom:1rem;border-bottom:0.5px solid var(--border)}
+.logo-mark{width:38px;height:38px;background:#2f80ed;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ap-title{font-size:20px;font-weight:600;color:var(--txt)}
+.ap-sub{font-size:12px;color:var(--txt2);margin-top:2px}
+.btn{font-size:12px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s;font-family:var(--font-sans)}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:#2f80ed;color:#fff;border-color:#2f80ed}
+.btn-primary:hover{background:#1a4f9e}
+.btn-danger{background:var(--red-bg);color:var(--red-txt);border-color:#5a1a1a}
+.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1.25rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;color:var(--txt2);border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap;transition:color .15s;font-family:var(--font-sans)}
+.tab:hover{color:var(--txt)}
+.tab.active{color:#58a6ff;border-bottom-color:#2f80ed;font-weight:500}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1.25rem}
+.mc{background:var(--bg1);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px}
+.mc-lbl{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.mc-val{font-size:22px;font-weight:500;color:var(--txt)}
+.mc-sub{font-size:11px;color:var(--txt3);margin-top:1px;display:flex;align-items:center;gap:4px}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%}
+.dg{background:#3fb950}.da{background:#d29922}.dr{background:#f85149}.db{background:#58a6ff}
+.filter-bar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{font-size:12px;padding:5px 8px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--txt);outline:none;font-family:var(--font-sans)}
+.filter-bar select option{background:var(--bg2);color:var(--txt)}
+.wt{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.wt th{text-align:left;padding:7px 8px;font-size:11px;font-weight:500;color:var(--txt2);border-bottom:0.5px solid var(--border);background:var(--bg1);white-space:nowrap}
+.wt td{padding:8px 8px;border-bottom:0.5px solid var(--border);color:var(--txt);vertical-align:middle}
+.wt tr:hover td{background:var(--bg2)}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.st-ip{background:var(--blue-bg);color:var(--blue-txt)}
+.st-q{background:var(--amber-bg);color:var(--amber-txt)}
+.st-done{background:var(--green-bg);color:var(--green-txt)}
+.st-hold{background:var(--red-bg);color:var(--red-txt)}
+.st-rev{background:var(--purple-bg);color:var(--purple-txt)}
+.pr-crit{background:var(--red-bg);color:var(--red-txt)}
+.pr-high{background:var(--amber-bg);color:var(--amber-txt)}
+.pr-med{background:var(--blue-bg);color:var(--blue-txt)}
+.pr-low{background:var(--green-bg);color:var(--green-txt)}
+.esd-y{background:var(--amber-bg);color:var(--amber-txt);border:0.5px solid #5a3e08}
+.esd-n{background:var(--bg2);color:var(--txt3);border:0.5px solid var(--border)}
+.pbar{height:5px;border-radius:3px;background:var(--bg3);overflow:hidden;min-width:50px}
+.pfill{height:100%;border-radius:3px}
+.pfg{background:#3fb950}.pfa{background:#d29922}.pfb{background:#2f80ed}.pfr{background:#f85149}
+.dl-ok{color:#3fb950}.dl-warn{color:#e3b341}.dl-over{color:#f85149}
+.sig-box{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;cursor:pointer;border:0.5px solid}
+.sig-y{background:var(--green-bg);color:var(--green-txt);border-color:#1e4d28}
+.sig-n{background:var(--bg2);color:var(--txt3);border-color:var(--border)}
+.card{background:var(--bg1);border-radius:10px;border:0.5px solid var(--border);padding:1rem 1.25rem;margin-bottom:10px}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:1rem}
+.tech-card{background:var(--bg1);border-radius:10px;border:0.5px solid var(--border);padding:1rem}
+.cap-bar-wrap{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;margin-bottom:6px}
+.cap-fill{height:100%;border-radius:4px;transition:width .4s}
+.cap-ok{background:#2f80ed}.cap-warn{background:#d29922}.cap-over{background:#f85149}
+.task-row{display:flex;align-items:center;padding:5px 0;border-top:0.5px solid var(--border);font-size:11px;gap:5px}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.72);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:1000;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg1);border-radius:12px;border:0.5px solid var(--border2);padding:1.25rem;width:100%;max-width:560px;flex-shrink:0}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.mtitle{font-size:15px;font-weight:500;color:var(--txt)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ff{grid-column:1/-1}
+.fl{display:flex;flex-direction:column;gap:3px}
+.flbl{font-size:11px;color:var(--txt2);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.fl input,.fl select,.fl textarea{width:100%;font-size:13px;padding:6px 9px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--txt);outline:none;font-family:var(--font-sans)}
+.fl input:focus,.fl select:focus,.fl textarea:focus{border-color:#2f80ed}
+.fl select option{background:var(--bg2);color:var(--txt)}
+.fl textarea{resize:vertical;min-height:52px}
+.factions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+.tog-row{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg2)}
+.tog{width:34px;height:19px;border-radius:10px;background:var(--border2);position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
+.tog.on{background:#2f80ed}
+.tog::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.tog.on::after{left:18px}
+.notice{font-size:12px;color:var(--txt2);padding:10px;background:var(--bg1);border-radius:8px;border-left:3px solid #2f80ed;display:flex;align-items:center;gap:8px}
+.week-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:6px;margin-top:8px}
+.week-cell{background:var(--bg2);border-radius:8px;border:0.5px solid var(--border);padding:8px;text-align:center}
+.week-day{font-size:11px;color:var(--txt2);margin-bottom:4px}
+.week-hrs{font-size:16px;font-weight:500;color:var(--txt)}
+.sign-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.sign-table th{text-align:left;padding:7px 8px;font-size:11px;font-weight:500;color:var(--txt2);border-bottom:0.5px solid var(--border);background:var(--bg1)}
+.sign-table td{padding:8px 8px;border-bottom:0.5px solid var(--border);color:var(--txt);vertical-align:middle}
+.sign-table tr:hover td{background:var(--bg2)}
+.pri-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:3px;flex-shrink:0}
+.ac-spirit{background:#1e1240;color:#bc8cff}
+.ac-spartan{background:#0d2340;color:#58a6ff}
+.ac-helius{background:#122820;color:#3fb950}
+.tbl-wrap{overflow-x:auto}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px;text-align:center;gap:12px}
+.empty-icon{width:56px;height:56px;border-radius:12px;background:var(--bg2);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center}
+@media(max-width:600px){
+  body{padding:.75rem}
+  .fg{grid-template-columns:1fr}
+  .ff{grid-column:1}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="ap-hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="logo-mark"><i class="ti ti-drone" style="color:#fff;font-size:20px"></i></div>
+    <div>
+      <div class="ap-title">Robinson Unmanned OPS</div>
+      <div class="ap-sub" id="live-date"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;background:var(--bg2);border:0.5px solid var(--border2)">
+      <i class="ti ti-shield-check" style="font-size:13px;color:#f0a0c0"></i>
+      <span style="font-size:12px;color:var(--txt2)">OPS:</span>
+      <span style="font-size:12px;font-weight:500;color:var(--txt)">J. Munroe</span>
+    </div>
+    <button class="btn" onclick="openModal()"><i class="ti ti-plus"></i> New Order</button>
+    <button class="btn btn-primary" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="sw('board',this)">Work Board</div>
+  <div class="tab" onclick="sw('tech',this)">Technician Workload</div>
+  <div class="tab" onclick="sw('capacity',this)">Hours Capacity</div>
+  <div class="tab" onclick="sw('signoff',this)">Inspection Sign-offs</div>
+  <div class="tab" onclick="sw('daily',this)">Daily</div>
+  <div class="tab" onclick="sw('weekly',this)">Weekly</div>
+  <div class="tab" onclick="sw('monthly',this)">Monthly</div>
+</div>
+
+<div id="v-board">
+  <div class="metrics" id="metrics-bar"></div>
+  <div class="filter-bar">
+    <i class="ti ti-filter" style="font-size:14px;color:#586374"></i>
+    <select id="f-st" onchange="renderBoard()"><option value="">All statuses</option><option>In Progress</option><option>Queued</option><option>Complete</option><option>On Hold</option><option>In Review</option></select>
+    <select id="f-pr" onchange="renderBoard()"><option value="">All priorities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+    <select id="f-ac" onchange="renderBoard()"><option value="">All aircraft</option><option>Spirit</option><option>Spartan</option><option>Helius</option></select>
+    <select id="f-tc" onchange="renderBoard()"><option value="">All techs</option></select>
+    <select id="f-esd" onchange="renderBoard()"><option value="">ESD — all</option><option value="yes">ESD required</option><option value="no">No ESD</option></select>
+    <input type="text" id="f-srch" placeholder="Search S/N / task…" oninput="renderBoard()" style="width:150px">
+  </div>
+  <div id="board-table"></div>
+</div>
+
+<div id="v-tech" style="display:none"><div class="tech-grid" id="tech-cards"></div></div>
+<div id="v-capacity" style="display:none"><div id="cap-content"></div></div>
+<div id="v-signoff" style="display:none"><div id="signoff-content"></div></div>
+<div id="v-daily" style="display:none"><div id="daily-content"></div></div>
+<div id="v-weekly" style="display:none"><div id="weekly-content"></div></div>
+<div id="v-monthly" style="display:none"><div id="monthly-content"></div></div>
+</div>
+
+<div class="modal-overlay" id="modal-wrap">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mtitle" id="m-title">New Work Order</div>
+    <button class="btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="fg">
+    <div class="fl"><label class="flbl">Aircraft S/N</label><input id="m-sn" placeholder="RU-0001"></div>
+    <div class="fl"><label class="flbl">Aircraft type</label>
+      <select id="m-ac"><option>Spirit</option><option>Spartan</option><option>Helius</option></select>
+    </div>
+    <div class="fl ff"><label class="flbl">Task / work description</label><input id="m-task" placeholder="e.g. Airframe inspection"></div>
+    <div class="fl"><label class="flbl">Assigned technician</label>
+      <select id="m-tech">
+        <option value="">— select tech —</option>
+        <option>Mac D.</option><option>Jon H.</option><option>Alex H.</option><option>Amanda</option>
+      </select>
+    </div>
+    <div class="fl"><label class="flbl">Status</label>
+      <select id="m-status"><option>In Progress</option><option>Queued</option><option>Complete</option><option>On Hold</option><option>In Review</option></select>
+    </div>
+    <div class="fl"><label class="flbl">Priority</label>
+      <select id="m-priority"><option value="">— select —</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+    </div>
+    <div class="fl"><label class="flbl">Phase</label>
+      <select id="m-phase"><option>Daily</option><option>Weekly</option><option>Monthly</option></select>
+    </div>
+    <div class="fl"><label class="flbl">Time allotted (hrs)</label><input type="number" id="m-hrs" placeholder="—" min="0.5" step="0.5"></div>
+    <div class="fl"><label class="flbl">Progress (%)</label><input type="number" id="m-prog" placeholder="0" min="0" max="100"></div>
+    <div class="fl"><label class="flbl">Deadline</label><input type="date" id="m-dead"></div>
+    <div class="fl ff"><label class="flbl">ESD protocol required</label>
+      <div class="tog-row">
+        <i class="ti ti-bolt" style="font-size:15px;color:#d29922"></i>
+        <span style="font-size:13px;color:var(--txt);flex:1">Electrostatic discharge protocol</span>
+        <button class="tog" id="esd-tog" onclick="toggleESD()"></button>
+      </div>
+    </div>
+    <div class="fl ff">
+      <label class="flbl">Inspection sign-offs</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <div class="fl"><label class="flbl" style="font-size:10px">Peer review</label><input id="m-peer" placeholder="Name or ID"></div>
+        <div class="fl"><label class="flbl" style="font-size:10px">QC approved by</label><input id="m-qc" placeholder="Name or ID"></div>
+      </div>
+    </div>
+    <div class="fl ff"><label class="flbl">Notes</label><textarea id="m-notes" placeholder="Additional instructions…"></textarea></div>
+  </div>
+  <div class="factions">
+    <button class="btn btn-danger" id="del-btn" onclick="deleteOrder()" style="display:none"><i class="ti ti-trash"></i> Delete</button>
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" id="save-btn" onclick="saveOrder()">Save order</button>
+  </div>
+</div>
+</div>
+
+<script>
+const TECHS=["Mac D.","Jon H.","Alex H.","Amanda"];
+const TECH_CAP=8;
+const today=new Date();today.setHours(0,0,0,0);
+const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const fmtS=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const toISO=d=>{const x=new Date(d);return x.toISOString().split('T')[0];};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const initials=n=>n.replace(/\./g,'').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);
+
+let esdV=false,editIdx=null,nextId=1;
+const AV_BG=["#0d2340","#1e1240","#122820","#2d1228"];
+const AV_TX=["#58a6ff","#bc8cff","#3fb950","#f0a0c0"];
+const AC_CLS={"Spirit":"ac-spirit","Spartan":"ac-spartan","Helius":"ac-helius"};
+
+let orders=[];
+try{const s=localStorage.getItem('ruops_v2');if(s){orders=JSON.parse(s);nextId=Math.max(1,...orders.map(o=>o.id+1));}}catch(e){}
+
+const stCls={"In Progress":"st-ip","Queued":"st-q","Complete":"st-done","On Hold":"st-hold","In Review":"st-rev"};
+const prCls={"Critical":"pr-crit","High":"pr-high","Medium":"pr-med","Low":"pr-low"};
+const prDot={"Critical":"#f85149","High":"#d29922","Medium":"#2f80ed","Low":"#3fb950"};
+
+function save(){try{localStorage.setItem('ruops_v2',JSON.stringify(orders));}catch(e){}}
+function pill(t,c){return`<span class="pill ${c}">${t}</span>`;}
+function esdBadge(e){return e?`<span class="pill esd-y"><i class="ti ti-bolt" style="font-size:10px"></i>ESD</span>`:`<span class="pill esd-n">—</span>`;}
+function acBadge(a){return`<span class="pill ${AC_CLS[a]||''}">${a}</span>`;}
+function dlCls(d,s){if(s==='Complete')return'dl-ok';const diff=Math.ceil((new Date(d)-today)/864e5);return diff<0?'dl-over':diff<=2?'dl-warn':'dl-ok';}
+function dlLabel(d,s){if(s==='Complete')return'Done';const diff=Math.ceil((new Date(d)-today)/864e5);return diff<0?`${Math.abs(diff)}d over`:diff===0?'Today':`${diff}d`;}
+function pfCls(p){return p>=80?'pfg':p>=40?'pfb':'pfa';}
+function techColor(t){const i=TECHS.indexOf(t);return{bg:AV_BG[i<0?0:i%4],tx:AV_TX[i<0?0:i%4]};}
+function emptyState(msg){return`<div class="empty-state"><div class="empty-icon"><i class="ti ti-clipboard-list" style="font-size:24px;color:var(--txt3)"></i></div><div style="font-size:14px;font-weight:500;color:var(--txt2)">${msg}</div><div style="font-size:12px;color:var(--txt3)">Use the <strong style="color:var(--txt2)">+ New Order</strong> button to get started</div></div>`;}
+
+function renderMetrics(){
+  const total=orders.length,ip=orders.filter(o=>o.status==='In Progress').length,
+    done=orders.filter(o=>o.status==='Complete').length,
+    overdue=orders.filter(o=>new Date(o.deadline)<today&&o.status!=='Complete').length,
+    crit=orders.filter(o=>o.priority==='Critical'&&o.status!=='Complete').length,
+    esd=orders.filter(o=>o.esd&&o.status!=='Complete').length;
+  document.getElementById('metrics-bar').innerHTML=`
+    <div class="mc"><div class="mc-lbl">Total orders</div><div class="mc-val">${total}</div><div class="mc-sub">all phases</div></div>
+    <div class="mc"><div class="mc-lbl">In progress</div><div class="mc-val">${ip}</div><div class="mc-sub"><span class="dot db"></span>active</div></div>
+    <div class="mc"><div class="mc-lbl">Complete</div><div class="mc-val">${done}</div><div class="mc-sub"><span class="dot dg"></span>this cycle</div></div>
+    <div class="mc"><div class="mc-lbl">Overdue</div><div class="mc-val">${overdue}</div><div class="mc-sub"><span class="dot dr"></span>past deadline</div></div>
+    <div class="mc"><div class="mc-lbl">Critical</div><div class="mc-val">${crit}</div><div class="mc-sub"><span class="dot dr"></span>open items</div></div>
+    <div class="mc"><div class="mc-lbl">ESD active</div><div class="mc-val">${esd}</div><div class="mc-sub"><span class="dot da"></span>open orders</div></div>`;
+}
+
+function renderBoard(){
+  const fSt=document.getElementById('f-st').value,fPr=document.getElementById('f-pr').value,
+    fAc=document.getElementById('f-ac').value,fTc=document.getElementById('f-tc').value,
+    fEsd=document.getElementById('f-esd').value,fSrch=document.getElementById('f-srch').value.toLowerCase();
+  let rows=orders.filter(o=>{
+    if(fSt&&o.status!==fSt)return false;
+    if(fPr&&o.priority!==fPr)return false;
+    if(fAc&&o.ac!==fAc)return false;
+    if(fTc&&o.tech!==fTc)return false;
+    if(fEsd==='yes'&&!o.esd)return false;
+    if(fEsd==='no'&&o.esd)return false;
+    if(fSrch&&!o.sn.toLowerCase().includes(fSrch)&&!o.task.toLowerCase().includes(fSrch)&&!o.ac.toLowerCase().includes(fSrch)&&!o.tech.toLowerCase().includes(fSrch))return false;
+    return true;
+  });
+  const div=document.getElementById('board-table');
+  if(!orders.length){div.innerHTML=emptyState('No work orders yet');return;}
+  if(!rows.length){div.innerHTML='<div class="notice"><i class="ti ti-filter-off" style="font-size:15px"></i>No work orders match the current filters.</div>';return;}
+  div.innerHTML=`<div class="tbl-wrap"><table class="wt">
+    <thead><tr>
+      <th style="width:82px">S/N</th><th style="width:80px">Aircraft</th><th style="width:auto">Task</th>
+      <th style="width:82px">Technician</th><th style="width:38px">Pri</th><th style="width:88px">Status</th>
+      <th style="width:80px">Progress</th><th style="width:52px">Hrs</th><th style="width:65px">Deadline</th>
+      <th style="width:52px">ESD</th><th style="width:56px">Sign-off</th><th style="width:44px"></th>
+    </tr></thead>
+    <tbody>${rows.map(o=>{
+      const idx=orders.indexOf(o),sigDone=[o.peer,o.qc].filter(Boolean).length,allDone=sigDone===2;
+      const tc=techColor(o.tech);
+      return`<tr>
+        <td style="font-family:var(--font-mono);font-size:11px;font-weight:500;color:#58a6ff">${o.sn}</td>
+        <td>${acBadge(o.ac)}</td>
+        <td style="font-size:12px">${o.task}${o.notes?`<div style="font-size:10px;color:#586374;margin-top:1px">${o.notes}</div>`:''}</td>
+        <td><div style="display:flex;align-items:center;gap:5px">
+          <div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0;background:${tc.bg};color:${tc.tx}">${initials(o.tech)}</div>
+          <span style="font-size:11px">${o.tech}</span></div></td>
+        <td><span class="pri-dot" style="background:${prDot[o.priority]||'#888'}"></span></td>
+        <td>${pill(o.status,stCls[o.status]||'')}</td>
+        <td><div style="display:flex;align-items:center;gap:4px"><div class="pbar" style="flex:1"><div class="pfill ${pfCls(o.progress)}" style="width:${o.progress}%"></div></div><span style="font-size:10px;color:#8b949e;min-width:26px">${o.progress}%</span></div></td>
+        <td style="font-size:12px">${o.hours}h</td>
+        <td class="${dlCls(o.deadline,o.status)}" style="font-size:11px;font-weight:500">${dlLabel(o.deadline,o.status)}</td>
+        <td>${esdBadge(o.esd)}</td>
+        <td><span class="sig-box ${allDone?'sig-y':'sig-n'}" onclick="editOrder(${idx})"><i class="ti ${allDone?'ti-circle-check':'ti-circle-dashed'}" style="font-size:11px"></i>${sigDone}/2</span></td>
+        <td><button class="btn" style="padding:3px 7px;font-size:11px" onclick="editOrder(${idx})"><i class="ti ti-edit"></i></button></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+function renderTech(){
+  document.getElementById('tech-cards').innerHTML=TECHS.map((tech,ti)=>{
+    const myO=orders.filter(o=>o.tech===tech&&o.status!=='Complete');
+    const hrs=myO.reduce((a,o)=>a+o.hours,0),cap=TECH_CAP*5,pct=Math.round(Math.min(100,(hrs/cap)*100));
+    const capCls=pct>=90?'cap-over':pct>=70?'cap-warn':'cap-ok';
+    return`<div class="tech-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;background:${AV_BG[ti%4]};color:${AV_TX[ti%4]}">${initials(tech)}</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--txt)">${tech}</div><div style="font-size:11px;color:var(--txt2)">${myO.length} active · ${hrs}h assigned</div></div>
+        <div style="text-align:right"><div style="font-size:18px;font-weight:500;color:var(--txt)">${pct}%</div><div style="font-size:10px;color:var(--txt3)">capacity</div></div>
+      </div>
+      <div class="cap-bar-wrap"><div class="cap-fill ${capCls}" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--txt3);margin-bottom:8px">${hrs}h of ${cap}h weekly capacity</div>
+      ${myO.length===0?`<div style="font-size:11px;color:var(--txt3);padding:4px 0">No active orders</div>`:
+      myO.map(o=>`<div class="task-row">
+        <span class="pri-dot" style="background:${prDot[o.priority]}"></span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:#58a6ff;flex-shrink:0">${o.sn}</span>
+        <span style="font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.task}</span>
+        <span style="font-size:10px;color:var(--txt2);flex-shrink:0">${o.hours}h</span>
+        ${pill(o.status,stCls[o.status]||'')}
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderCapacity(){
+  const days=['Mon','Tue','Wed','Thu','Fri'];
+  const wkO=orders.filter(o=>o.status!=='Complete'),dCap=TECH_CAP*TECHS.length;
+  const dayHrs=days.map((_,di)=>wkO.filter((_,i)=>i%5===di).reduce((a,o)=>a+o.hours,0));
+  document.getElementById('cap-content').innerHTML=`<div class="card">
+    <div style="font-size:13px;font-weight:500;color:var(--txt);margin-bottom:4px">Weekly hours capacity</div>
+    <div style="font-size:11px;color:var(--txt2);margin-bottom:12px">Daily max: ${dCap}h · ${TECHS.length} techs × ${TECH_CAP}h/day</div>
+    <div class="week-grid">${days.map((day,di)=>{
+      const hrs=dayHrs[di],pct=Math.round((hrs/dCap)*100);
+      const clr=pct>=90?'#f85149':pct>=70?'#d29922':'#2f80ed';
+      return`<div class="week-cell"><div class="week-day">${day}</div><div class="week-hrs">${hrs}h</div>
+        <div style="height:4px;background:#21293a;border-radius:2px;margin:4px 0"><div style="width:${Math.min(100,pct)}%;height:100%;background:${clr};border-radius:2px"></div></div>
+        <div style="font-size:10px;margin-top:2px;color:${clr}">${pct}%</div></div>`;
+    }).join('')}</div></div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:500;color:var(--txt);margin-bottom:12px">Technician capacity breakdown</div>
+    <table class="sign-table"><thead><tr><th>Technician</th><th>Active orders</th><th>Hrs assigned</th><th>Weekly cap</th><th>Utilization</th></tr></thead>
+    <tbody>${TECHS.map((tech,ti)=>{
+      const myO=orders.filter(o=>o.tech===tech&&o.status!=='Complete');
+      const hrs=myO.reduce((a,o)=>a+o.hours,0),cap=TECH_CAP*5,pct=Math.round((hrs/cap)*100);
+      const cls=pct>=90?'pfr':pct>=70?'pfa':'pfb';
+      return`<tr><td><div style="display:flex;align-items:center;gap:6px">
+        <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;background:${AV_BG[ti%4]};color:${AV_TX[ti%4]}">${initials(tech)}</div>
+        <span>${tech}</span></div></td>
+        <td>${myO.length}</td><td>${hrs}h</td><td>${cap}h</td>
+        <td><div style="display:flex;align-items:center;gap:6px">
+          <div class="pbar" style="width:80px"><div class="pfill ${cls}" style="width:${Math.min(100,pct)}%"></div></div>
+          <span style="font-size:11px;color:var(--txt2)">${pct}%</span>
+        </div></td></tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+function renderSignoff(){
+  const active=orders.filter(o=>o.status!=='Complete'&&o.status!=='Queued');
+  const div=document.getElementById('signoff-content');
+  if(!active.length){div.innerHTML=emptyState('No orders pending sign-off');return;}
+  div.innerHTML=`<div style="margin-bottom:12px;font-size:12px;color:var(--txt2)">${active.length} orders requiring sign-off review</div>
+  <div class="tbl-wrap"><table class="sign-table"><thead><tr>
+    <th style="width:80px">S/N</th><th style="width:82px">Aircraft</th><th style="width:auto">Task</th>
+    <th style="width:88px">Status</th><th style="width:38px">Pri</th>
+    <th style="width:120px">Peer review</th><th style="width:130px">QC approved by</th><th style="width:60px">Complete</th>
+  </tr></thead>
+  <tbody>${active.map(o=>{
+    const idx=orders.indexOf(o),sigDone=[o.peer,o.qc].filter(Boolean).length,allDone=sigDone===2;
+    return`<tr>
+      <td style="font-family:var(--font-mono);font-size:11px;font-weight:500;color:#58a6ff">${o.sn}</td>
+      <td>${acBadge(o.ac)}</td><td style="font-size:12px">${o.task}</td>
+      <td>${pill(o.status,stCls[o.status]||'')}</td>
+      <td><span class="pri-dot" style="background:${prDot[o.priority]}"></span></td>
+      <td><span class="sig-box ${o.peer?'sig-y':'sig-n'}" onclick="editOrder(${idx})">${o.peer||'Pending'}</span></td>
+      <td><span class="sig-box ${o.qc?'sig-y':'sig-n'}" onclick="editOrder(${idx})">${o.qc||'Pending'}</span></td>
+      <td><span class="sig-box ${allDone?'sig-y':'sig-n'}"><i class="ti ${allDone?'ti-circle-check':'ti-circle-dashed'}" style="font-size:11px"></i>${sigDone}/2</span></td>
+    </tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+
+function renderDaily(){
+  const rows=orders.filter(o=>o.phase==='Daily'||o.deadline===toISO(today));
+  const div=document.getElementById('daily-content');
+  if(!rows.length){div.innerHTML=emptyState('No daily work orders');return;}
+  div.innerHTML=rows.map(o=>`<div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;color:#58a6ff">${o.sn}</span>
+        ${acBadge(o.ac)}<span style="font-size:13px">${o.task}</span>
+      </div>
+      <div style="display:flex;gap:5px;align-items:center">${pill(o.priority,prCls[o.priority]||'')}${pill(o.status,stCls[o.status]||'')}${esdBadge(o.esd)}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;font-size:12px;flex-wrap:wrap">
+      <span style="color:var(--txt2)"><i class="ti ti-user" style="vertical-align:-1px;margin-right:4px"></i>${o.tech}</span>
+      <span style="color:var(--txt2)"><i class="ti ti-clock" style="vertical-align:-1px;margin-right:4px"></i>${o.hours}h allotted</span>
+      <span class="${dlCls(o.deadline,o.status)}"><i class="ti ti-calendar" style="vertical-align:-1px;margin-right:4px"></i>${dlLabel(o.deadline,o.status)}</span>
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px"><div class="pbar" style="flex:1"><div class="pfill ${pfCls(o.progress)}" style="width:${o.progress}%"></div></div><span style="font-size:11px;color:var(--txt2)">${o.progress}%</span></div>
+    </div>
+  </div>`).join('');
+}
+
+function renderWeekly(){
+  const days=['Mon','Tue','Wed','Thu','Fri'];
+  const all=orders.filter(o=>o.phase==='Weekly'||o.phase==='Daily');
+  document.getElementById('weekly-content').innerHTML=days.map((day,di)=>{
+    const slice=all.filter((_,i)=>i%5===di),hrs=slice.reduce((a,o)=>a+o.hours,0);
+    return`<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:500">${day} · ${fmtS(addD(today,di-(today.getDay()||7)+1))}</div>
+        <div style="font-size:11px;color:var(--txt2)">${slice.length} orders · ${hrs}h</div>
+      </div>
+      ${slice.length===0?`<div style="font-size:11px;color:var(--txt3);padding:4px 0">No orders scheduled</div>`:
+      slice.map(o=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:0.5px solid var(--border);font-size:12px">
+        <span class="pri-dot" style="background:${prDot[o.priority]}"></span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:#58a6ff;flex-shrink:0">${o.sn}</span>
+        ${acBadge(o.ac)}
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.task}</span>
+        <span style="font-size:11px;color:var(--txt2);flex-shrink:0">${o.tech}</span>
+        <span style="font-size:11px;color:var(--txt2);flex-shrink:0">${o.hours}h</span>
+        ${pill(o.status,stCls[o.status]||'')}
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderMonthly(){
+  const phases=['Daily','Weekly','Monthly'];
+  document.getElementById('monthly-content').innerHTML=`
+  <div class="metrics" style="margin-bottom:1rem">${phases.map(p=>{
+    const c=orders.filter(o=>o.phase===p),d=c.filter(o=>o.status==='Complete').length;
+    return`<div class="mc"><div class="mc-lbl">${p} phase</div><div class="mc-val">${c.length}</div><div class="mc-sub">${d} done · ${c.reduce((a,o)=>a+o.hours,0)}h</div></div>`;
+  }).join('')}</div>
+  ${['Week 1','Week 2','Week 3','Week 4'].map((wk,wi)=>{
+    const slice=orders.slice(wi*3,wi*3+3);
+    return`<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:500">${wk}</div>
+        <div style="font-size:11px;color:var(--txt2)">${slice.length} aircraft · ${slice.reduce((a,o)=>a+o.hours,0)}h</div>
+      </div>
+      ${slice.length===0?`<div style="font-size:11px;color:var(--txt3);padding:4px 0">No orders this week</div>`:
+      slice.map(o=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:0.5px solid var(--border);font-size:12px">
+        <span class="pri-dot" style="background:${prDot[o.priority]}"></span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:#58a6ff;flex-shrink:0">${o.sn}</span>
+        ${acBadge(o.ac)}
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.task}</span>
+        <div style="display:flex;align-items:center;gap:4px"><div class="pbar" style="width:60px"><div class="pfill ${pfCls(o.progress)}" style="width:${o.progress}%"></div></div><span style="font-size:10px;color:var(--txt2)">${o.progress}%</span></div>
+        <span style="font-size:11px;color:var(--txt2)">${o.hours}h</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('')}`;
+}
+
+function sw(view,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['board','tech','capacity','signoff','daily','weekly','monthly'].forEach(v=>{
+    document.getElementById('v-'+v).style.display=v===view?'':'none';
+  });
+  if(view==='tech')renderTech();
+  if(view==='capacity')renderCapacity();
+  if(view==='signoff')renderSignoff();
+  if(view==='daily')renderDaily();
+  if(view==='weekly')renderWeekly();
+  if(view==='monthly')renderMonthly();
+}
+
+function populateFilters(){
+  document.getElementById('f-tc').innerHTML='<option value="">All techs</option>'+TECHS.map(t=>`<option>${t}</option>`).join('');
+}
+function toggleESD(){esdV=!esdV;document.getElementById('esd-tog').className='tog'+(esdV?' on':'');}
+
+function openModal(idx=null){
+  editIdx=idx;esdV=false;
+  const o=idx!==null?orders[idx]:null;
+  document.getElementById('m-title').textContent=o?'Edit Work Order':'New Work Order';
+  document.getElementById('save-btn').textContent=o?'Update order':'Save order';
+  document.getElementById('del-btn').style.display=o?'inline-flex':'none';
+  document.getElementById('m-sn').value=o?o.sn:'';
+  document.getElementById('m-ac').value=o?o.ac:'Spirit';
+  document.getElementById('m-task').value=o?o.task:'';
+  document.getElementById('m-tech').value=o?o.tech:'';
+  document.getElementById('m-status').value=o?o.status:'In Progress';
+  document.getElementById('m-priority').value=o?o.priority:'';
+  document.getElementById('m-phase').value=o?o.phase:'Daily';
+  document.getElementById('m-hrs').value=o?o.hours:'';
+  document.getElementById('m-prog').value=o?o.progress:'';
+  document.getElementById('m-dead').value=o?o.deadline:'';
+  document.getElementById('m-notes').value=o?o.notes:'';
+  document.getElementById('m-peer').value=o?o.peer:'';
+  document.getElementById('m-qc').value=o?o.qc:'';
+  esdV=o?o.esd:false;
+  document.getElementById('esd-tog').className='tog'+(esdV?' on':'');
+  document.getElementById('modal-wrap').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-wrap').classList.remove('open');}
+function editOrder(idx){openModal(idx);}
+function deleteOrder(){
+  if(editIdx===null)return;
+  if(!confirm('Delete this work order?'))return;
+  orders.splice(editIdx,1);save();closeModal();renderMetrics();renderBoard();
+}
+function saveOrder(){
+  const o={
+    id:editIdx!==null?orders[editIdx].id:nextId++,
+    sn:document.getElementById('m-sn').value||'—',
+    ac:document.getElementById('m-ac').value,
+    task:document.getElementById('m-task').value||'(no description)',
+    tech:document.getElementById('m-tech').value,
+    status:document.getElementById('m-status').value,
+    priority:document.getElementById('m-priority').value||'Medium',
+    hours:parseFloat(document.getElementById('m-hrs').value)||0,
+    progress:parseInt(document.getElementById('m-prog').value)||0,
+    deadline:document.getElementById('m-dead').value,
+    phase:document.getElementById('m-phase').value,
+    esd:esdV,
+    notes:document.getElementById('m-notes').value,
+    peer:document.getElementById('m-peer').value,
+    qc:document.getElementById('m-qc').value
+  };
+  if(editIdx!==null)orders[editIdx]=o;else orders.unshift(o);
+  save();closeModal();renderMetrics();renderBoard();
+}
+function exportCSV(){
+  if(!orders.length){alert('No work orders to export.');return;}
+  const cols=['S/N','Aircraft','Task','Technician','Priority','Status','Progress%','Hours','Deadline','Phase','ESD','Peer Review','QC Approved By','Notes'];
+  const rows=orders.map(o=>[o.sn,o.ac,`"${o.task}"`,o.tech,o.priority,o.status,o.progress,o.hours,o.deadline,o.phase,o.esd?'Yes':'No',o.peer,o.qc,`"${o.notes}"`].join(','));
+  const blob=new Blob([[cols.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='robinson_unmanned_ops.csv';a.click();
+}
+
+document.getElementById('modal-wrap').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('live-date').textContent='Production week — '+fmt(today);
+populateFilters();renderMetrics();renderBoard();
+</script>
+</body>
+</html>
